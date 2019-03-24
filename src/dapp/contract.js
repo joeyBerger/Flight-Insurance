@@ -7,8 +7,9 @@ export default class Contract {
 
         let config = Config[network];
         this.web3 = new Web3(new Web3.providers.HttpProvider(config.url));
-       // this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
-        this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.dataAddress);
+        this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
+        //this.flightSuretyApp = new this.web3.eth.Contract(FlightSuretyApp.abi, config.dataAddress);
+        console.log(config.dataAddress);
         //web3.eth.contract(abi).new(param1,param2,{data:code}, callback);
         this.initialize(callback);
         this.owner = null;
@@ -38,7 +39,7 @@ export default class Contract {
     isOperational(callback) {
        let self = this;
        self.flightSuretyApp.methods
-            .isOperational()
+            .test3()
             .call({ from: self.owner}, callback);
     }
 
@@ -73,7 +74,14 @@ export default class Contract {
         .call({ from: self.owner}, callback);
      }
 
-     testFunc(callback) {
+     testFunc1(callback) {
+        let self = this;
+        self.flightSuretyApp.methods
+        .test1()
+        .call({ from: self.owner}, callback);
+     }
+
+     testFunc2(callback) {
         let self = this;
         self.flightSuretyApp.methods
         .test2()

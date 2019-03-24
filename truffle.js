@@ -3,7 +3,7 @@ var mnemonic = "candy maple cake sugar pudding cream honey rich smooth crumble s
 mnemonic = "ski truck real uniform dune number party drama fancy uncover fat burden";
 mnemonic = "loyal sign include mirror shed panic traffic traffic obtain muffin thank anxiety";
 mnemonic = "tell foil harbor summer people put woman country opinion write first switch";
-// ganache-cli --mnemonic "tell foil harbor summer people put woman country opinion write first switch"
+// ganache-cli --mnemonic "tell foil harbor summer people put woman country opinion write first switch" -a 40
 module.exports = {
   networks: {
     development: {

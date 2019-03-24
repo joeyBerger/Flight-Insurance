@@ -18,9 +18,16 @@ import './flightsurety.css';
 
 
         contract.generateFlights((error, result) => {
-            console.log("isOperational",error,result);
+            console.log("Flight Registered",error,result);
             //display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         });
+
+        // contract.testFunc1((error, result) => {
+        //     console.log("testFunc1",error,result);
+        //     //display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
+        // });
+
+        
     
 
         // User-submitted transaction
@@ -33,11 +40,18 @@ import './flightsurety.css';
         // })
 
         // User-submitted transaction
-        DOM.elid('test').addEventListener('click', () => {
-            contract.testFunc((error, result) => {
+        DOM.elid('test1').addEventListener('click', () => {
+            contract.testFunc1((error, result) => {
                 console.log(result);
             });
         })    
+
+        // User-submitted transaction
+        DOM.elid('test2').addEventListener('click', () => {
+            contract.testFunc2((error, result) => {
+                console.log(result);
+            });
+        })   
     });  
 })();
 

@@ -9,7 +9,7 @@ module.exports = function(deployer) {
     deployer.deploy(FlightSuretyData,firstAirline)
     .then(() => {
         //deployer.link(FlightSuretyData, FlightSuretyApp);
-        console.log("address",FlightSuretyData.address);
+        //console.log("address",FlightSuretyData.address);
         return deployer.deploy(FlightSuretyApp,FlightSuretyData.address)
                 .then(() => {
                     
