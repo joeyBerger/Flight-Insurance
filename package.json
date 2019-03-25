@@ -9,6 +9,8 @@
   "license": "MIT",
   "scripts": {
     "test": "truffle test ./test/flightSurety.js",
+    "test1": "truffle test ./test/flightSurety1.js",
+    "oracleTest": "truffle test ./test/oracles.js",
     "dapp": "webpack-dev-server --mode development --config webpack.config.dapp.js",
     "dapp:prod": "webpack --mode production  --config webpack.config.dapp.js",
     "server": "rm -rf ./build/server && webpack --config webpack.config.server.js"
@@ -43,5 +45,7 @@
     "webpack-dev-server": "3.1.14",
     "webpack-node-externals": "1.7.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "truffle-assertions": "^0.8.0"
+  }
 }

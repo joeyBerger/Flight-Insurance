@@ -22,24 +22,16 @@ contract FlightSuretyApp {
     // Account used to deploy contract
     address private contractOwner;         
 
+    // bool isOperationalFlag;
+
     //Function Modifiers
 
-    /**
-    * @dev Modifier that requires the "operational" boolean variable to be "true"
-    *      This is used on all state changing functions to pause the contract in 
-    *      the event there is an issue that needs to be fixed
-    */
-    
-    
-    
-    //TODO
-
     // Modify to call data contract's status
-    modifier requireIsOperational() 
-    {         
-        require(true == true, "Contract is currently not operational");  
-        _;
-    }
+    // modifier requireIsOperational() 
+    // {         
+    //     require(isOperationalFlag == true, "Contract is currently not operational");  
+    //     _;
+    // }
 
     //Modifier that requires the "ContractOwner" account to be the function caller
     modifier requireContractOwner()
@@ -96,14 +88,20 @@ contract FlightSuretyApp {
         //airlinesRegistered = 0;
         flightSuretyData = FlightSuretyData(dataContract);
         flightSuretyData.registerInitialAirline();
+        // isOperationalFlag = true;
     }
 
     //Utility Functions
 
-    function isOperational() public pure requireIsOperational returns(bool) 
-    {
-        return false;
-    }
+    // function isOperational() public pure requireIsOperational returns(bool) 
+    // {
+    //     return isOperationalFlag;
+    // }
+
+    // function isOperational() public pure requireIsOperational returns(bool) 
+    // {
+    //     return isOperationalFlag;
+    // }
 
     //Smart Contract Functions
 
@@ -136,9 +134,11 @@ contract FlightSuretyApp {
         // Flight memory newFlight = Flight(true,STATUS_CODE_UNKNOWN,timeStamp,airlineAddress);
         // flights[flight] = newFlight;
         flightSuretyData.registerFlight(flight,timeStamp,STATUS_CODE_UNKNOWN,airlineAddress);
+        //flightSuretyData.test1();
+
     }
 
-    function isFlightRegistered(bytes32 flight) public view returns (bool)
+    function isFlightRegistered(bytes32 flight) public returns (bool)
     {
         bool registered = flightSuretyData.isFlightRegistered(flight);
         return registered;
@@ -149,7 +149,7 @@ contract FlightSuretyApp {
         flightSuretyData.buy(flight);
     }
 
-    function test() public view returns (bool)
+    function test() public pure returns (bool)
     {
         return true;
     }
@@ -172,24 +172,12 @@ contract FlightSuretyApp {
         //return true;
     }
 
-    // function simpleTest() public returns(bool) 
-    // {
-    //     return false;
-    // }
-
     //Called after oracle has updated flight status
-    function processFlightStatus(address airline, string memory flight, uint256 timestamp, uint8 statusCode) internal pure
+    function processFlightStatus(address airline, string memory flight, uint256 timestamp, uint8 statusCode) internal
     {
-        //TODO
-    //         struct Flight {
-    //     bool isRegistered;
-    //     uint8 statusCode;
-    //     uint256 updatedTimestamp;        
-    //     address airline;
-    // }
-    // mapping(bytes32 => Flight) private flights;        
+        //update flight status in data
+        flightSuretyData.processFlightStatus(airline,flight,timestamp,statusCode);   
     }
-
 
     // Generate a request for oracles to fetch flight information
     function fetchFlightStatus(address airline,string flight,uint256 timestamp) external
@@ -336,6 +324,7 @@ contract FlightSuretyApp {
 contract FlightSuretyData {
     //function registerAirline() external;
     function registerFlight(bytes32 flight, uint timeStamp, uint8 statusCode, address airlineAddress) external;
+    function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external;
     function isFlightRegistered(bytes32 flight) external returns (bool);
     function buy(bytes32 flight) external payable;
     function test1() external;

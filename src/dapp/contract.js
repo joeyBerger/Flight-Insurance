@@ -60,25 +60,37 @@ export default class Contract {
     generateFlights(callback) {
         let self = this;
         let flights = ["flight1","flight2","flight3"];
+        console.log(Math.floor(Date.now() / 1000));
         for (var i = 0; i < flights.length; i++) {
             self.flightSuretyApp.methods
-            .registerFlight(this.web3.utils.fromAscii("flight1"),1234,this.airlines[0])
+            .registerFlight(this.web3.utils.fromAscii(flights[i]),1234,this.airlines[0])
             .call({ from: self.owner}, callback);
         }
+     }
+
+     generateFlight(flight, callback) {
+         console.log(flight);
+        let self = this;
+        self.flightSuretyApp.methods
+        .registerFlight(this.web3.utils.fromAscii(flight),Math.floor(Date.now() / 1000),this.airlines[0])
+        .send({ from: self.owner}, callback);    
+
+        // .test1()
+        // .send({ from: self.owner}, callback);    
      }
 
      isFlightRegistered(flight, callback) {
         let self = this;
         self.flightSuretyApp.methods
         .isFlightRegistered(this.web3.utils.fromAscii("flight1"))
-        .call({ from: self.owner}, callback);
+        .send({ from: self.owner}, callback);
      }
 
      testFunc1(callback) {
         let self = this;
         self.flightSuretyApp.methods
         .test1()
-        .call({ from: self.owner}, callback);
+        .send({ from: self.owner}, callback);
      }
 
      testFunc2(callback) {

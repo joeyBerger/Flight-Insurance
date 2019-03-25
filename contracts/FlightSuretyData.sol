@@ -13,7 +13,7 @@ contract FlightSuretyData {
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
-        uint256 updatedTimestamp;        
+        uint256 updatedTimestamp;     
         address airline;
     }
     mapping(bytes32 => Flight) private flights;
@@ -44,6 +44,46 @@ contract FlightSuretyData {
     }
     mapping(address => NewAirline) private newAirline;
 
+    struct TempStruct {
+        uint tempInt;
+    }
+    mapping(address => TempStruct) private tempMap;
+
+    struct TempStruct1 {
+        address airline;
+        uint statusCode;
+        bool isRegistered;  
+    }
+    mapping(bytes32 => TempStruct1) private tempMap1;
+
+    struct TempStruct2 {
+        bool isRegistered;
+        uint8 statusCode;
+        uint256 updatedTimestamp;     
+        address airline;
+
+        //this works
+        // address airline;
+        // uint statusCode;
+
+        //this works
+        // address airline;
+        // uint statusCode;
+        // bool isRegistered;            
+    }
+    mapping(bytes32 => TempStruct2) private tempMap2;
+
+
+    struct TempStruct3 {
+        address temp0;
+        bool temp1;
+        bool temp2;   
+        bool temp3;  
+        bool temp4;   
+        bool temp5;        
+    }
+    mapping(bytes32 => TempStruct3) private tempMap3;
+
     uint256 insuranceBalance;
 
     address initialAirline;
@@ -63,14 +103,14 @@ contract FlightSuretyData {
     //Function Modifiers
     modifier requireIsOperational() 
     {
-        require(operational, "Contract is currently not operational");
+        require(operational == true, "Contract is currently not operational");
         _;
     }
 
     //Modifier that requires the "ContractOwner" account to be the function caller
     modifier requireContractOwner()
     {
-        //require(msg.sender == contractOwner, "Caller is not contract owner");
+        require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
     }
 
@@ -101,6 +141,10 @@ contract FlightSuretyData {
         _;
     }
 
+    //Events
+
+    event Test2(uint256 returnVal);
+
     //Utility Functions
 
     //Get operating status of contract
@@ -110,7 +154,7 @@ contract FlightSuretyData {
     }
 
     //Query whether flight is available
-    function isFlightRegistered(bytes32 flight) external returns (bool)
+    function isFlightRegistered(bytes32 flight) view external returns (bool)
     {
         if (flights[flight].updatedTimestamp == 0) {
             return false;
@@ -118,15 +162,21 @@ contract FlightSuretyData {
         return true;
     }
 
+    function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) pure external
+    {
+        //TODO
+        //flights[flight].updatedTimestamp = 1;
+    }
+
     //View insurance purchased for flight
-    function viewInsurancePurchasedForFlight(bytes32 flight) view returns(uint256)
+    function viewInsurancePurchasedForFlight(bytes32 flight) public view returns(uint256)
     {
         uint256 amount = insurance[flight].purchaseAmount;
         return amount;
     }
 
     //View Credited Account Balance
-    function viewCreditedAccount() view returns(uint256)
+    function viewCreditedAccount() view public returns(uint256)
     {
         address creditAddress = msg.sender;
         uint256 amount = account[creditAddress].creditAmount;
@@ -139,18 +189,18 @@ contract FlightSuretyData {
         operational = mode;
     }
 
-    function returnInitialAirline() external returns(address)
+    function returnInitialAirline() view external returns(address)
     {
         return initialAirline;
     }
 
-    function returnAirlineFunded(address airline) returns(bool)
+    function returnAirlineFunded(address airline) view public returns(bool)
     {
         bool isFunded = airlines[airline].isFunded;
         return isFunded;
     }
 
-    function returnAirlinesRegistered() external returns(uint)
+    function returnAirlinesRegistered() view external returns(uint)
     {
         return airlinesRegistered;
     }
@@ -164,15 +214,13 @@ contract FlightSuretyData {
         airlinesRegistered = airlinesRegistered.add(1);
         Airline memory newAirline = Airline(airlinesRegistered,airlineAddress,false);
         airlines[airlineAddress] = newAirline;
-
-
     }
 
     function registerInitialAirline() external  
     {
-            airlinesRegistered = airlinesRegistered.add(1);
-            Airline memory newAirline = Airline(airlinesRegistered,initialAirline,false);
-            airlines[initialAirline] = newAirline;
+        airlinesRegistered = airlinesRegistered.add(1);
+        Airline memory newAirline = Airline(airlinesRegistered,initialAirline,false);
+        airlines[initialAirline] = newAirline;
     }   
 
     function fundAirline() external payable requireEtherEqualTo10
@@ -181,7 +229,7 @@ contract FlightSuretyData {
         insuranceBalance = insuranceBalance.add(msg.value);
     }
     
-    function isAirline(address airline) public returns(bool) 
+    function isAirline(address airline) view public returns(bool) 
     {
         // airlines[airline].registrationNumb = 4;
         // return false;
@@ -209,9 +257,25 @@ contract FlightSuretyData {
 
     function registerFlight(bytes32 flight, uint timeStamp,uint8 statusCode,address airlineAddress) requireIsOperational external
     {
-        Flight memory newFlight = Flight(true,statusCode,timeStamp,airlineAddress);
-        flights[flight] = newFlight;
-        flightsRegistered++;
+        //works in test, not in dapp
+        // Flight memory newFlight = Flight(true,statusCode,timeStamp,contractOwner);
+        // flights[flight] = newFlight;
+        // flightsRegistered = flightsRegistered.add(1);
+
+        //works in dapp
+        // TempStruct1 memory newThing = TempStruct1(airlineAddress,statusCode,true);
+        // tempMap1[flight] = newThing;
+
+        //does not work in dapp
+        // TempStruct2 memory newFlight = TempStruct2(true,statusCode,timeStamp,contractOwner);
+        // tempMap2[flight] = newFlight;
+        // flightsRegistered = flightsRegistered.add(1);
+
+        //works in dapp
+        TempStruct3 memory newFlight = TempStruct3(airlineAddress,true,true,true,false,false);
+        tempMap3[flight] = newFlight;
+        flightsRegistered = flightsRegistered.add(1);
+
     }
 
     // Buy insurance for a flight
@@ -228,7 +292,7 @@ contract FlightSuretyData {
         address creditAddress = msg.sender;
         uint256 amount0 = insurance[flight].purchaseAmount.div(2);
         uint256 amount1 = insurance[flight].purchaseAmount;
-        uint256 returnAmount = amount0.add(amount1);
+        //uint256 returnAmount = amount0.add(amount1);
         account[creditAddress].creditAmount = amount1.add(amount0).add(account[creditAddress].creditAmount);
         return account[creditAddress].creditAmount;
     }
@@ -260,23 +324,25 @@ contract FlightSuretyData {
         fund();
     }
 
-    function test() public view returns (bool)
+    function test() public pure returns (bool)
     {
         return false;
     }
 
     function test1() external
     {
-        //flightsRegistered = flightsRegistered.add(50);
-        flightsRegistered = 50;
+        flightsRegistered = flightsRegistered.add(50);
+        //flightsRegistered = 50;
     }
 
-    function test2() external returns (uint256)
+    function test2() view external returns (uint256)
     {
+        // noregistered = flightsRegistered;
+        // return noregistered;
         return flightsRegistered;
     }
 
-    function test3() external returns (bool)
+    function test3() pure external returns (bool)
     {
         return true;
     }
