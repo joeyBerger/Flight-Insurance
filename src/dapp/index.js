@@ -26,7 +26,6 @@ import './flightsurety.css';
         //     console.log("testFunc1",error,result);
         //     //display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         // });
-
         // User-submitted transaction
         // DOM.elid('submit-oracle').addEventListener('click', () => {
         //     let flight = DOM.elid('flight-number').value;
@@ -49,7 +48,42 @@ import './flightsurety.css';
             contract.testFunc2((error, result) => {
                 console.log(result);
             });
-        })   
+        })  
+        
+        // User-submitted transaction
+        DOM.elid('test3').addEventListener('click', () => {
+            contract.testFunc3((error, result) => {
+                console.log(result);
+            });
+        })  
+
+        // User-submitted transaction
+        DOM.elid('test4').addEventListener('click', () => {
+            contract.testFunc4((error, result) => {
+                console.log(result);
+            });
+        })  
+
+        // User-submitted transaction
+        DOM.elid('test5').addEventListener('click', () => {
+            contract.testFunc5((error, result) => {
+                console.log(result);
+            });
+        }) 
+
+        // User-submitted transaction
+        DOM.elid('test6').addEventListener('click', () => {
+            contract.testFunc6((error, result) => {
+                console.log(result);
+            });
+        }) 
+
+        // User-submitted transaction
+        DOM.elid('test7').addEventListener('click', () => {
+            contract.testFunc7((error, result) => {
+                console.log(result);
+            });
+        }) 
     });  
 })();
 

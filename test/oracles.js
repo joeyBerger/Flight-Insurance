@@ -14,14 +14,6 @@ contract('Oracles', async (accounts) => {
     const STATUS_CODE_LATE_OTHER = 50;
 
     let statusArr = [STATUS_CODE_UNKNOWN, STATUS_CODE_ON_TIME, STATUS_CODE_LATE_WEATHER, STATUS_CODE_LATE_TECHNICAL, STATUS_CODE_LATE_OTHER, STATUS_CODE_LATE_AIRLINE, STATUS_CODE_LATE_AIRLINE, STATUS_CODE_LATE_AIRLINE, STATUS_CODE_LATE_AIRLINE, STATUS_CODE_LATE_AIRLINE];
-    // let statusDict = {
-    //     STATUS_CODE_UNKNOWN : "STATUS_CODE_UNKNOWN",
-    //     STATUS_CODE_ON_TIME : "STATUS_CODE_ON_TIME",
-    //     STATUS_CODE_LATE_AIRLINE : "STATUS_CODE_LATE_AIRLINE",
-    //     STATUS_CODE_LATE_WEATHER : "STATUS_CODE_LATE_WEATHER",
-    //     STATUS_CODE_LATE_TECHNICAL : "STATUS_CODE_LATE_TECHNICAL",
-    //     STATUS_CODE_LATE_OTHER : "STATUS_CODE_LATE_OTHER",
-    // }
     let statusDict = [];
     statusDict[STATUS_CODE_UNKNOWN] = "STATUS_CODE_UNKNOWN";
     statusDict[STATUS_CODE_ON_TIME] = "STATUS_CODE_ON_TIME";
@@ -88,9 +80,9 @@ contract('Oracles', async (accounts) => {
         let flight = 'ND1309'; // Course number
         let timestamp = Math.floor(Date.now() / 1000);
 
-        // Submit a request for oracles to get status information for a flight
-        await config.flightSuretyApp.fetchFlightStatus(config.firstAirline, flight, timestamp);
         // ACT
+        // Submit a request for oracles to get status information for a flight
+        await config.flightSuretyApp.fetchFlightStatus(config.firstAirline, flight, timestamp);        
 
         // Since the Index assigned to each test account is opaque by design
         // loop through all the accounts and for each account, all its Indexes (indices?)

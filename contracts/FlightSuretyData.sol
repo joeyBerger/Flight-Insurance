@@ -10,6 +10,7 @@ contract FlightSuretyData {
     // Blocks all state changes throughout the contract if false                          
     bool private operational = true;                                    
 
+    //going to move this to app
     struct Flight {
         bool isRegistered;
         uint8 statusCode;
@@ -17,9 +18,11 @@ contract FlightSuretyData {
         address airline;
     }
     mapping(bytes32 => Flight) private flights;
+    //going to move this to app
 
     uint airlinesRegistered;
-    uint flightsRegistered;
+
+
     struct Airline {
         uint registrationNumb;
         address airline;
@@ -27,11 +30,11 @@ contract FlightSuretyData {
     }
     mapping(address => Airline) private airlines;
 
-    struct PurchasedInsurance {
-        uint256 purchaseAmount;
-        address owner;
-    }
-    mapping(bytes32 => PurchasedInsurance) private insurance;
+    // struct PurchasedInsurance {
+    //     uint256 purchaseAmount;
+    //     address owner;
+    // }
+    // mapping(bytes32 => PurchasedInsurance) private insurance;
 
 
     struct Accounts {
@@ -44,55 +47,52 @@ contract FlightSuretyData {
     }
     mapping(address => NewAirline) private newAirline;
 
-    struct TempStruct {
-        uint tempInt;
-    }
-    mapping(address => TempStruct) private tempMap;
+    // struct TempStruct {
+    //     uint tempInt;
+    // }
+    // mapping(address => TempStruct) private tempMap;
 
-    struct TempStruct1 {
-        address airline;
-        uint statusCode;
-        bool isRegistered;  
-    }
-    mapping(bytes32 => TempStruct1) private tempMap1;
+    // struct TempStruct1 {
+    //     address airline;
+    //     uint statusCode;
+    //     bool isRegistered;  
+    // }
+    // mapping(bytes32 => TempStruct1) private tempMap1;
 
-    struct TempStruct2 {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;     
-        address airline;
+    // struct TempStruct2 {
+    //     bool isRegistered;
+    //     uint8 statusCode;
+    //     uint256 updatedTimestamp;     
+    //     address airline;      
+    // }
+    // mapping(bytes32 => TempStruct2) private tempMap2;
 
-        //this works
-        // address airline;
-        // uint statusCode;
-
-        //this works
-        // address airline;
-        // uint statusCode;
-        // bool isRegistered;            
-    }
-    mapping(bytes32 => TempStruct2) private tempMap2;
-
-
-    struct TempStruct3 {
-        address temp0;
-        bool temp1;
-        bool temp2;   
-        bool temp3;  
-        bool temp4;   
-        bool temp5;        
-    }
-    mapping(bytes32 => TempStruct3) private tempMap3;
+    // struct TempStruct3 {
+    //     address temp0;
+    //     bool temp1;
+    //     bool temp2;   
+    //     bool temp3;  
+    //     bool temp4;   
+    //     bool temp5;        
+    // }
+    // mapping(bytes32 => TempStruct3) private tempMap3;
 
     uint256 insuranceBalance;
 
     address initialAirline;
 
+    // Flight status codees
+    uint8 private constant STATUS_CODE_UNKNOWN = 0;
+    uint8 private constant STATUS_CODE_ON_TIME = 10;
+    uint8 private constant STATUS_CODE_LATE_AIRLINE = 20;
+    uint8 private constant STATUS_CODE_LATE_WEATHER = 30;
+    uint8 private constant STATUS_CODE_LATE_TECHNICAL = 40;
+    uint8 private constant STATUS_CODE_LATE_OTHER = 50;
+
     //Constructor
     constructor(address airlineAddress) public 
     {
         contractOwner = msg.sender;
-        flightsRegistered = 0;
         airlinesRegistered = 0;
         initialAirline = airlineAddress;
         //registerAirline(airlineAddress);
@@ -118,6 +118,12 @@ contract FlightSuretyData {
     modifier flightExists(bytes32 flight)
     {
         require(flights[flight].updatedTimestamp != 0, "Flight does not exist");
+        _;
+    }
+
+    modifier requireFlightDoesntExist(bytes32 flight)
+    {
+        require(flights[flight].updatedTimestamp == 0, "Flight already exists");
         _;
     }
 
@@ -162,18 +168,28 @@ contract FlightSuretyData {
         return true;
     }
 
-    function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) pure external
+    function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external
     {
         //TODO
         //flights[flight].updatedTimestamp = 1;
+
+        bytes32 temp = "fda";
+        if (statusCode == STATUS_CODE_LATE_AIRLINE)
+        {
+            creditInsurees(temp);
+        }
     }
 
+    //  function Time_call() returns (uint256){
+    //     return now;
+    // }
+
     //View insurance purchased for flight
-    function viewInsurancePurchasedForFlight(bytes32 flight) public view returns(uint256)
-    {
-        uint256 amount = insurance[flight].purchaseAmount;
-        return amount;
-    }
+    // function viewInsurancePurchasedForFlight(bytes32 flight) public view returns(uint256)
+    // {
+    //     uint256 amount = insurance[flight].purchaseAmount;
+    //     return amount;
+    // }
 
     //View Credited Account Balance
     function viewCreditedAccount() view public returns(uint256)
@@ -223,10 +239,11 @@ contract FlightSuretyData {
         airlines[initialAirline] = newAirline;
     }   
 
-    function fundAirline() external payable requireEtherEqualTo10
+    function fundAirline() external payable  //requireEtherEqualTo10
     {
         airlines[msg.sender].isFunded = true;
         insuranceBalance = insuranceBalance.add(msg.value);
+
     }
     
     function isAirline(address airline) view public returns(bool) 
@@ -249,68 +266,66 @@ contract FlightSuretyData {
             NewAirline memory newAirlineEntry = NewAirline(1);
             newAirline[inewAirline] = newAirlineEntry;
         }
-        else
+        else 
         {
             newAirline[inewAirline].votes = newAirline[inewAirline].votes.add(1);
         }
     }
 
-    function registerFlight(bytes32 flight, uint timeStamp,uint8 statusCode,address airlineAddress) requireIsOperational external
+    function registerFlight(bytes32 flight, uint256 timeStamp, uint8 statusCode, address airlineAddress)
+        requireIsOperational 
+        //requireFlightDoesntExist(flight) 
+        external //  
+    //function registerFlight(bytes32 flight, uint timeStamp,address airlineAddress) external // requireIsOperational 
     {
+        //uint256 time = Time_call();
+
         //works in test, not in dapp
-        // Flight memory newFlight = Flight(true,statusCode,timeStamp,contractOwner);
-        // flights[flight] = newFlight;
-        // flightsRegistered = flightsRegistered.add(1);
-
-        //works in dapp
-        // TempStruct1 memory newThing = TempStruct1(airlineAddress,statusCode,true);
-        // tempMap1[flight] = newThing;
-
-        //does not work in dapp
-        // TempStruct2 memory newFlight = TempStruct2(true,statusCode,timeStamp,contractOwner);
-        // tempMap2[flight] = newFlight;
-        // flightsRegistered = flightsRegistered.add(1);
-
-        //works in dapp
-        TempStruct3 memory newFlight = TempStruct3(airlineAddress,true,true,true,false,false);
-        tempMap3[flight] = newFlight;
-        flightsRegistered = flightsRegistered.add(1);
-
+        Flight memory newFlight = Flight(true,statusCode,0,contractOwner);
+        flights[flight] = newFlight;
     }
 
-    // Buy insurance for a flight
-    function buy(bytes32 flight) external payable flightExists(flight)
-    {
-        address buyerAddress = msg.sender;
-        PurchasedInsurance memory newInsurance = PurchasedInsurance(msg.value,buyerAddress);
-        insurance[flight] = newInsurance;
-    }
+    // // Buy insurance for a flight
+    // function buy(bytes32 flight) external payable //flightExists(flight) newPurchase(flight)  //moving to app contract
+    // {
+    //     address buyerAddress = msg.sender;
+    //     PurchasedInsurance memory newInsurance = PurchasedInsurance(msg.value,buyerAddress);
+    //     insurance[flight] = newInsurance;
+    // }
     
     //Credits payouts to insurees
-    function creditInsurees(bytes32 flight) external returns(uint256)                                  
+    function creditInsurees(bytes32 flight) payable returns(uint256)                                  
     {
-        address creditAddress = msg.sender;
-        uint256 amount0 = insurance[flight].purchaseAmount.div(2);
-        uint256 amount1 = insurance[flight].purchaseAmount;
-        //uint256 returnAmount = amount0.add(amount1);
-        account[creditAddress].creditAmount = amount1.add(amount0).add(account[creditAddress].creditAmount);
-        return account[creditAddress].creditAmount;
+        // address creditAddress = msg.sender;
+        // uint256 amount0 = insurance[flight].purchaseAmount.div(2);
+        // uint256 amount1 = insurance[flight].purchaseAmount;
+        // //uint256 returnAmount = amount0.add(amount1);
+        // account[creditAddress].creditAmount = amount1.add(amount0).add(account[creditAddress].creditAmount);
+        // return account[creditAddress].creditAmount;
+
+        uint256 temp = 0;
+        return 0;
     }
 
     //Transfers eligible payout funds to insuree
-    function pay()external payable
-    {
-        require(account[msg.sender].creditAmount > 0);
-        uint256 prev = account[msg.sender].creditAmount;
-        account[msg.sender].creditAmount = 0;
-        insuranceBalance-= prev;
-        msg.sender.transfer(prev);
-    }
+    // function pay()external payable
+    // {
+    //     require(account[msg.sender].creditAmount > 0);
+    //     uint256 prev = account[msg.sender].creditAmount;
+    //     account[msg.sender].creditAmount = 0;
+    //     insuranceBalance-= prev;
+    //     msg.sender.transfer(prev);
+    // }
 
     //Initial funding for the insurance. Unless there are too many delayed flights resulting in insurance payouts, the contract should be self-sustaining
     function fund() public payable
     {
         insuranceBalance = msg.value;
+    }
+
+    function deductInsuranceFundUponCredit(uint256 amount) external
+    {
+        insuranceBalance = insuranceBalance.sub(amount);
     }
 
     function getFlightKey(address airline,string memory flight,uint256 timestamp) pure internal returns(bytes32) 
@@ -331,15 +346,12 @@ contract FlightSuretyData {
 
     function test1() external
     {
-        flightsRegistered = flightsRegistered.add(50);
-        //flightsRegistered = 50;
     }
 
     function test2() view external returns (uint256)
     {
-        // noregistered = flightsRegistered;
-        // return noregistered;
-        return flightsRegistered;
+        uint256 tempReturn = 46;
+        return tempReturn;
     }
 
     function test3() pure external returns (bool)

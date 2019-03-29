@@ -11,7 +11,7 @@ contract FlightSuretyApp {
 
     FlightSuretyData flightSuretyData;
 
-    // Flight status codees
+    // Flight status codes
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
     uint8 private constant STATUS_CODE_LATE_AIRLINE = 20;
@@ -22,16 +22,37 @@ contract FlightSuretyApp {
     // Account used to deploy contract
     address private contractOwner;         
 
-    // bool isOperationalFlag;
+    struct TempStruct2 {
+        bool isRegistered;
+        uint8 statusCode;
+        uint256 updatedTimestamp;     
+        address airline; 
+        mapping(bytes32 => PurchasedInsurance) insurance;       
+        // bytes32[] questionList;
+
+    }
+    mapping(bytes32 => TempStruct2) private tempMap2;
+
+    struct PurchasedInsurance {
+        uint256 purchaseAmount;
+        address owner;
+    }
+    
+    struct Accounts {
+        uint256 creditAmount;
+    }
+    mapping(address => Accounts) account;
+
+    bool isOperationalFlag;
 
     //Function Modifiers
 
     // Modify to call data contract's status
-    // modifier requireIsOperational() 
-    // {         
-    //     require(isOperationalFlag == true, "Contract is currently not operational");  
-    //     _;
-    // }
+    modifier requireIsOperational() 
+    {         
+        require(isOperationalFlag == true, "Contract is currently not operational");  
+        _;
+    }
 
     //Modifier that requires the "ContractOwner" account to be the function caller
     modifier requireContractOwner()
@@ -44,6 +65,21 @@ contract FlightSuretyApp {
     {
         bool registered = isFlightRegistered(flight);
         require(registered == true, "Flight must be registered in order to purchase insurance");
+        _;
+    }
+
+    //Modifier that purchaser has not already purchased insurance
+    modifier requireNewPurchase(bytes32 flight)
+    {
+        //require(insurance[flight].owner == address(0), "Flight insurance has already been purchased by buyer");
+        require(true == true, "Flight insurance has already been purchased by buyer");
+        _;
+    }
+
+    modifier requireFlightNotRegistered(bytes32 flight)
+    {
+        bool registered = isFlightRegistered(flight);
+        require(registered == false, "Flight must not already be registered");
         _;
     }
 
@@ -68,6 +104,13 @@ contract FlightSuretyApp {
         _;
     }
 
+    //Modifier that checks if a flight exists
+    // modifier flightExists(bytes32 flight)
+    // {
+    //     require(tempMap2[flight].updatedTimestamp != 0, "Flight does not exist");
+    //     _;
+    // }
+
     //Modifier that checks if registering airline is indeed the initial airline
     modifier requiReregisteringAirlineIsInitial()
     {
@@ -88,65 +131,87 @@ contract FlightSuretyApp {
         //airlinesRegistered = 0;
         flightSuretyData = FlightSuretyData(dataContract);
         flightSuretyData.registerInitialAirline();
-        // isOperationalFlag = true;
+        isOperationalFlag = true;
     }
 
     //Utility Functions
-
-    // function isOperational() public pure requireIsOperational returns(bool) 
-    // {
-    //     return isOperationalFlag;
-    // }
-
-    // function isOperational() public pure requireIsOperational returns(bool) 
-    // {
-    //     return isOperationalFlag;
-    // }
+    function isOperational() public view returns(bool) 
+    {
+        return isOperationalFlag;
+    }
 
     //Smart Contract Functions
 
     //Add an airline to the registration queue
     function registerAirline(address airline) public returns(bool success, uint256 votes)
     {
-        uint airlinesRegistered = flightSuretyData.returnAirlinesRegistered();
-
-        if (airlinesRegistered < 5)
-        {
-            // address initialAirline = flightSuretyData.returnInitialAirline();
-            // if (initialAirline != msg.sender)
-            // {
-            //     return(false,0);
-            // }
-            flightSuretyData.registerAirline(airline);
-            return(true,0);
-        }
-        return (success, 0);
+        flightSuretyData.registerAirline(airline);
     }
 
-    function fundAirline() public payable requireEtherEqualTo10
+    function fundAirline() public payable requireEtherEqualTo10 
     {
         flightSuretyData.fundAirline();
     }
 
     //Register a future flight for insuring.
-    function registerFlight(bytes32 flight, uint timeStamp, address airlineAddress) public
+    function registerFlight(bytes32 flight, uint256 timeStamp, address airlineAddress) public requireFlightNotRegistered(flight)
     {
-        // Flight memory newFlight = Flight(true,STATUS_CODE_UNKNOWN,timeStamp,airlineAddress);
-        // flights[flight] = newFlight;
-        flightSuretyData.registerFlight(flight,timeStamp,STATUS_CODE_UNKNOWN,airlineAddress);
-        //flightSuretyData.test1();
-
+        TempStruct2 memory newFlight = TempStruct2(true,0,timeStamp,contractOwner);
+        tempMap2[flight] = newFlight;
     }
 
     function isFlightRegistered(bytes32 flight) public returns (bool)
     {
-        bool registered = flightSuretyData.isFlightRegistered(flight);
-        return registered;
+        bool testBool = tempMap2[flight].updatedTimestamp != 0;
+        return testBool;
     }
 
-    function buy(bytes32 flight) public requireFlightRegistered(flight) requireEtherMoreThanZero requireEtherNoMoreThanOneEther
+    function buy(bytes32 flight) public payable requireFlightRegistered(flight) requireNewPurchase(flight) requireEtherMoreThanZero requireEtherNoMoreThanOneEther
     {
-        flightSuretyData.buy(flight);
+        address buyerAddress = msg.sender;
+        PurchasedInsurance memory newInsurance = PurchasedInsurance(msg.value,buyerAddress);        
+        tempMap2[flight].insurance[flight] = newInsurance;
+        
+        //dont think i need this, maybe shouldnt need to be initilized?
+        // Accounts memory newAccount = Accounts(0);
+        // account[buyerAddress] = newAccount;
+    }
+
+    function creditInsurees(bytes32 flight) public payable returns(uint256)                                   
+    {
+        //uint creditAmount = flightSuretyData.creditInsurees(flight);
+
+        //address creditAddress = msg.sender;
+        uint256 amount0 = tempMap2[flight].insurance[flight].purchaseAmount.div(2);
+        uint256 amount1 = tempMap2[flight].insurance[flight].purchaseAmount;        
+        uint256 returnAmount = amount0.add(amount1);
+        //insuranceBalance-= prev;
+        // old balls: account[creditAddress].creditAmount = amount1.add(amount0).add(account[creditAddress].creditAmount);
+        
+        account[msg.sender].creditAmount = returnAmount.add(account[msg.sender].creditAmount);
+        //flightSuretyData.deductInsuranceFundUponCredit(returnAmount);
+        
+        return returnAmount;
+    }
+
+    function returnCreditAmount() public view returns(uint256)
+    {
+        return account[msg.sender].creditAmount;
+    }
+
+    function payout() public payable
+    {
+        require(account[msg.sender].creditAmount > 0);        
+        uint256 prev = account[msg.sender].creditAmount;
+        account[msg.sender].creditAmount = 0;        
+        msg.sender.transfer(prev);
+    }
+
+    function tempReturnCreditAmount() public view returns(uint256 returnVal)
+    {
+        address creditAddress = msg.sender;
+        account[creditAddress].creditAmount = 888;
+        returnVal = account[creditAddress].creditAmount;
     }
 
     function test() public pure returns (bool)
@@ -167,9 +232,14 @@ contract FlightSuretyApp {
 
     function test3() public view returns (bool)
     {
-        bool val = flightSuretyData.test3();
-        return val;
-        //return true;
+        // bool val = flightSuretyData.test3();
+        // return val;
+        return true;
+    }
+
+    function test4() public view returns (uint8)
+    {
+        return getRandomIndex(msg.sender);
     }
 
     //Called after oracle has updated flight status
@@ -201,7 +271,7 @@ contract FlightSuretyApp {
     uint256 public constant REGISTRATION_FEE = 1 ether;
 
     // Number of oracles that must respond for valid status
-    uint256 private constant MIN_RESPONSES = 3;  //3;  TODO: Should be 3
+    uint256 private constant MIN_RESPONSES = 3;
 
 
     struct Oracle {
@@ -322,11 +392,13 @@ contract FlightSuretyApp {
 
 //Data Interface
 contract FlightSuretyData {
-    //function registerAirline() external;
-    function registerFlight(bytes32 flight, uint timeStamp, uint8 statusCode, address airlineAddress) external;
+    //function registerAirline(address airlineAddress) external;
+    //function registerFlight(bytes32 flight, uint256 timeStamp, uint8 statusCode, address airlineAddress) external;
     function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external;
     function isFlightRegistered(bytes32 flight) external returns (bool);
-    function buy(bytes32 flight) external payable;
+    function deductInsuranceFundUponCredit(uint256 amount) external;
+    //function buy(bytes32 flight) external payable;
+    //function creditInsurees(bytes32 flight) payable external returns(uint256);
     function test1() external;
     function test2() returns (uint256);
     function test3() public view returns (bool);
