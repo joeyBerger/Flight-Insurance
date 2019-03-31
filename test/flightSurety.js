@@ -10,8 +10,6 @@ contract('Flight Surety Tests', async (accounts) => {
     let fundAmount = 1;
     fundAmount = web3.utils.toWei(fundAmount.toString(), 'ether');
     config.flightSuretyData.fund({value:fundAmount});
-    // console.log(config.flightSuretyData);
-    // await config.flightSuretyData.authorizeCaller(config.flightSuretyApp.address);  not sure where this function exists
   });
   
   it(`(multiparty) has correct initial isOperational() value`, async function () {
@@ -75,8 +73,7 @@ contract('Flight Surety Tests', async (accounts) => {
   amount = web3.utils.toWei(amount.toString(), 'ether');
 
   // ACT
-  await config.flightSuretyData.fundAirline({from: config.firstAirline, value: amount})  //bypassing modifer
-  //await config.flightSuretyApp.fundAirline({from: config.firstAirline, value: amount})
+  await config.flightSuretyData.fundAirline({from: config.firstAirline, value: amount}) 
 
   // ACT
   try {
@@ -152,68 +149,4 @@ contract('Flight Surety Tests', async (accounts) => {
 
     assert.equal(insuranceValue, purchaseAmount, "Insurance bought unsuccessfully"); 
   });
-
-
-  // it('(client) can claim insurance and have amount credited()', async () => {    
-  //   // ARRANGE
-  //   let newAirline = accounts[2];
-  //   let timeStamp = Date.now();
-  //   let flightName = web3.utils.fromAscii("SX123");
-
-  //   let buyer = accounts[3];
-  //   let amount = 1;
-  //   let insuranceValue = web3.utils.toWei(amount.toString(), 'ether');
-
-  //   // ACT
-  //   //await config.flightSuretyApp.registerFlight(flightName,timeStamp,newAirline);
-  //   //await config.flightSuretyData.buy(flightName,{from: buyer, value: insuranceValue});
-
-  //   await config.flightSuretyApp.creditInsurees(flightName,{from: buyer});
-  //   let creditAmount = await config.flightSuretyApp.returnCreditAmount({from: buyer});
-  //   creditAmount = creditAmount.toString();
-
-  //   amount *= 1.5;
-  //   insuranceValue = web3.utils.toWei(amount.toString(), 'ether');
-  //   assert.equal(insuranceValue, creditAmount, "Insurance math is incorrect"); 
-  // });
-
-//used to work
-  // it('(client) can transfer funds to account after purchasing insurance and having flight delayed', async () => {    
-  //   // ARRANGE
-  //   let newAirline = accounts[2];
-  //   let timeStamp = Date.now();
-  //   let flightName = web3.utils.fromAscii("SX123");
-
-  //   let buyer = accounts[3];
-  //   let amount = 1;
-  //   let insuranceValue = web3.utils.toWei(amount.toString(), 'ether');
-
-  //   let balanceOfUserBeforeTransaction = await web3.eth.getBalance(buyer);
-
-  //   // ACT
-  //   //await config.flightSuretyApp.registerFlight(flightName,timeStamp,newAirline);
-  //   //await config.flightSuretyData.buy(flightName,{from: buyer, value: insuranceValue});
-
-  //   //await config.flightSuretyApp.creditInsurees(flightName,{from: buyer});
-  //   let creditAmount = await config.flightSuretyApp.returnCreditAmount({from: buyer});
-  //   creditAmount = creditAmount.toString();
-  //   console.log("creditAmount",creditAmount);
-  //   amount *= 1.5;
-  //   insuranceValue = web3.utils.toWei(amount.toString(), 'ether');
-  //   //assert.equal(insuranceValue, creditAmount, "Flight that exists is showing as not registered"); 
-    
-  //   try {
-  //     await config.flightSuretyApp.payout({from: buyer});
-  //   }
-  //   catch(e){
-  //     console.log(e);
-  //   }
-    
-
-  //   let balanceOfUserAfterTransaction = await web3.eth.getBalance(buyer);
-  //   //console.log("balanceOfUserAfterTransaction",balanceOfUserAfterTransaction,balanceOfUserAfterTransaction-balanceOfUserBeforeTransaction,insuranceValue);
-
-  //   let newAccountBalance = balanceOfUserAfterTransaction > balanceOfUserBeforeTransaction;
-  //   assert.equal(newAccountBalance, true, "Account incorrectly payed");
-  // });
 });

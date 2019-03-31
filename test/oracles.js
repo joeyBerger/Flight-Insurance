@@ -24,23 +24,8 @@ contract('Oracles', async (accounts) => {
 
     var config;
     before('setup contract', async () => {
-        console.log("STATUS_CODE_UNKNOWN", STATUS_CODE_UNKNOWN);
         config = await Test.Config(accounts);
     });
-
-    // it('can register oracles', async () => {
-
-    //     // ARRANGE
-    //     let fee = await config.flightSuretyApp.REGISTRATION_FEE.call();
-    //     let flight = 'ND1309'; // Course number
-    //     let timestamp = Math.floor(Date.now() / 1000);
-
-    //     // Submit a request for oracles to get status information for a flight
-    //     let tx = await config.flightSuretyApp.fetchFlightStatus(config.firstAirline, flight, timestamp);
-    //     truffleAssert.eventEmitted(tx, 'OracleRequest', (ev) => {
-    //         return ev.flight = flight;
-    //     });
-    // });
 
     it('can register oracles', async () => {
 
@@ -60,11 +45,24 @@ contract('Oracles', async (accounts) => {
         }
     });
 
+    /*
     it('can request flight status', async () => {
 
         // ARRANGE
         let flight = 'ND1309'; // Course number
         let timestamp = Math.floor(Date.now() / 1000);
+
+        let newAirline = accounts[2];
+        let timeStamp = Date.now();
+        let flightName = web3.utils.fromAscii(flight);
+  
+        // ACT
+        try {
+            await config.flightSuretyApp.registerFlight(flightName,timeStamp,newAirline);
+        }
+        catch(e) {
+            console.log(e);
+        }
 
         // ACT
         // Submit a request for oracles to get status information for a flight
@@ -83,7 +81,7 @@ contract('Oracles', async (accounts) => {
             for (let idx = 0; idx < 3; idx++) {
                 try {
                     // Submit a response...it will only be accepted if there is an Index match         
-                    let tx = await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx].toNumber(), config.firstAirline, web3.utils.fromAscii(flight), timestamp, statusArr[statusInd], {
+                    let tx = await config.flightSuretyApp.submitOracleResponse(oracleIndexes[idx].toNumber(), config.firstAirline, flightName, timestamp, statusArr[0], {
                         from: accounts[a]
                     });
                     try {
@@ -92,9 +90,6 @@ contract('Oracles', async (accounts) => {
                             return true;
                         });
                     } catch (e) {}
-
-                    //let flightStatus = await config.flightSuretyApp.fetchFlightStatus(config.firstAirline,flight,timestamp);
-                    // console.log(idx,oracleIndexes[idx],flight,timestamp,flightStatus);
                 } catch (e) {
                     // Enable this when debugging
                     console.log('\nError', idx, oracleIndexes[idx].toNumber(), flight, timestamp, e);
@@ -102,4 +97,5 @@ contract('Oracles', async (accounts) => {
             }
         }
     });
+    */
 });
