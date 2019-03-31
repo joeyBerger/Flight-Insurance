@@ -1,14 +1,10 @@
 pragma solidity ^0.4.25;
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
-/************************************************** */
-/* FlightSurety Smart Contract                      */
-/************************************************** */
 contract FlightSuretyApp {
     using SafeMath for uint256; 
 
     //Data Variables
-
     FlightSuretyData flightSuretyData;
 
     // Flight status codes
@@ -22,16 +18,15 @@ contract FlightSuretyApp {
     // Account used to deploy contract
     address private contractOwner;         
 
-    struct TempStruct2 {
+    struct Flight {
         bool isRegistered;
         uint8 statusCode;
         uint256 updatedTimestamp;     
         address airline; 
+        address [] insuredAddresses;
         mapping(bytes32 => PurchasedInsurance) insurance;       
-        // bytes32[] questionList;
-
     }
-    mapping(bytes32 => TempStruct2) private tempMap2;
+    mapping(bytes32 => Flight) private flights;
 
     struct PurchasedInsurance {
         uint256 purchaseAmount;
@@ -71,8 +66,7 @@ contract FlightSuretyApp {
     //Modifier that purchaser has not already purchased insurance
     modifier requireNewPurchase(bytes32 flight)
     {
-        //require(insurance[flight].owner == address(0), "Flight insurance has already been purchased by buyer");
-        require(true == true, "Flight insurance has already been purchased by buyer");
+        require(flights[flight].insurance[flight].owner == address(0), "Flight insurance has already been purchased by buyer");
         _;
     }
 
@@ -104,10 +98,16 @@ contract FlightSuretyApp {
         _;
     }
 
+    modifier statusCodeIsUnknown(bytes32 flight)
+    {
+        require(flights[flight].statusCode == STATUS_CODE_UNKNOWN, "Status code must be unknown");
+        _;
+    }
+
     //Modifier that checks if a flight exists
     // modifier flightExists(bytes32 flight)
     // {
-    //     require(tempMap2[flight].updatedTimestamp != 0, "Flight does not exist");
+    //     require(flights[flight].updatedTimestamp != 0, "Flight does not exist");
     //     _;
     // }
 
@@ -156,42 +156,54 @@ contract FlightSuretyApp {
     //Register a future flight for insuring.
     function registerFlight(bytes32 flight, uint256 timeStamp, address airlineAddress) public requireFlightNotRegistered(flight)
     {
-        TempStruct2 memory newFlight = TempStruct2(true,0,timeStamp,contractOwner);
-        tempMap2[flight] = newFlight;
+        Flight memory newFlight = Flight(true,0,timeStamp,contractOwner,new address[](0));
+        flights[flight] = newFlight;
     }
 
     function isFlightRegistered(bytes32 flight) public returns (bool)
     {
-        bool testBool = tempMap2[flight].updatedTimestamp != 0;
-        return testBool;
+        bool isRegistered = flights[flight].updatedTimestamp != 0;
+        return isRegistered;
     }
 
     function buy(bytes32 flight) public payable requireFlightRegistered(flight) requireNewPurchase(flight) requireEtherMoreThanZero requireEtherNoMoreThanOneEther
     {
         address buyerAddress = msg.sender;
         PurchasedInsurance memory newInsurance = PurchasedInsurance(msg.value,buyerAddress);        
-        tempMap2[flight].insurance[flight] = newInsurance;
+        flights[flight].insurance[flight] = newInsurance;
+
+        //flights[flight].insuredAddresses[0] = buyerAddress;
+        flights[flight].insuredAddresses.push(buyerAddress);
         
         //dont think i need this, maybe shouldnt need to be initilized?
         // Accounts memory newAccount = Accounts(0);
         // account[buyerAddress] = newAccount;
     }
 
-    function creditInsurees(bytes32 flight) public payable returns(uint256)                                   
+    //function creditInsurees(bytes32 flight) public payable returns(uint256)           
+    function creditInsurees(bytes32 flight, address insuredAddress) payable returns(uint256)                                   
     {
-        //uint creditAmount = flightSuretyData.creditInsurees(flight);
-
         //address creditAddress = msg.sender;
-        uint256 amount0 = tempMap2[flight].insurance[flight].purchaseAmount.div(2);
-        uint256 amount1 = tempMap2[flight].insurance[flight].purchaseAmount;        
+        uint256 amount0 = flights[flight].insurance[flight].purchaseAmount.div(2);
+        uint256 amount1 = flights[flight].insurance[flight].purchaseAmount;        
         uint256 returnAmount = amount0.add(amount1);
+
+        //not working for some reason:
+        //flightSuretyData.deductInsuranceFundUponCredit(returnAmount);
+
         //insuranceBalance-= prev;
         // old balls: account[creditAddress].creditAmount = amount1.add(amount0).add(account[creditAddress].creditAmount);
         
-        account[msg.sender].creditAmount = returnAmount.add(account[msg.sender].creditAmount);
-        //flightSuretyData.deductInsuranceFundUponCredit(returnAmount);
+        //account[msg.sender].creditAmount = returnAmount.add(account[msg.sender].creditAmount);
+        account[insuredAddress].creditAmount = returnAmount.add(account[insuredAddress].creditAmount);
         
         return returnAmount;
+    }
+
+    function returnedPurchasedAmount(bytes32 flight) public view returns(uint256)
+    {
+        return flights[flight].insurance[flight].purchaseAmount;
+        // return account[msg.sender].creditAmount;
     }
 
     function returnCreditAmount() public view returns(uint256)
@@ -199,54 +211,26 @@ contract FlightSuretyApp {
         return account[msg.sender].creditAmount;
     }
 
-    function payout() public payable
+    function payout() public payable 
     {
-        require(account[msg.sender].creditAmount > 0);        
+        require(account[msg.sender].creditAmount > 0); 
         uint256 prev = account[msg.sender].creditAmount;
         account[msg.sender].creditAmount = 0;        
         msg.sender.transfer(prev);
     }
 
-    function tempReturnCreditAmount() public view returns(uint256 returnVal)
-    {
-        address creditAddress = msg.sender;
-        account[creditAddress].creditAmount = 888;
-        returnVal = account[creditAddress].creditAmount;
-    }
-
-    function test() public pure returns (bool)
-    {
-        return true;
-    }
-
-    function test1() public
-    {
-        flightSuretyData.test1();
-    }
-
-    function test2() public returns (uint256)
-    {
-        uint256 returnVal = flightSuretyData.test2();
-        return returnVal;
-    }
-
-    function test3() public view returns (bool)
-    {
-        // bool val = flightSuretyData.test3();
-        // return val;
-        return true;
-    }
-
-    function test4() public view returns (uint8)
-    {
-        return getRandomIndex(msg.sender);
-    }
-
     //Called after oracle has updated flight status
-    function processFlightStatus(address airline, string memory flight, uint256 timestamp, uint8 statusCode) internal
+    function processFlightStatus(address airline, bytes32 flight, uint256 timestamp, uint8 statusCode) internal statusCodeIsUnknown(flight)
     {
-        //update flight status in data
-        flightSuretyData.processFlightStatus(airline,flight,timestamp,statusCode);   
+        flights[flight].statusCode = statusCode;        
+        if (statusCode == STATUS_CODE_LATE_AIRLINE)
+        {            
+            //creditInsurees(flight);
+            for (uint i=0; i < flights[flight].insuredAddresses.length; i++)
+            {
+                creditInsurees(flight,flights[flight].insuredAddresses[i]);
+            }
+        }
     }
 
     // Generate a request for oracles to fetch flight information
@@ -296,14 +280,18 @@ contract FlightSuretyApp {
     mapping(bytes32 => ResponseInfo) private oracleResponses;
 
     // Event fired each time an oracle submits a response
-    event FlightStatusInfo(address airline, string flight, uint256 timestamp, uint8 status);
+    event OracleRegistered();
 
-    event OracleReport(address airline, string flight, uint256 timestamp, uint8 status);
+    event FlightStatusInfo(address airline, bytes32 flight, uint256 timestamp, uint8 status);
+
+    event OracleReport(address airline, bytes32 flight, uint256 timestamp, uint8 status);
 
     // Event fired when flight status request is submitted
     // Oracles track this and if they have a matching index
     // they fetch data and submit a response
     event OracleRequest(uint8 index, address airline, string flight, uint256 timestamp);
+
+    event CreditAccount(bytes32 flight,address insuredAddress);
 
     // Register an oracle with the contract
     function registerOracle() external payable
@@ -314,6 +302,8 @@ contract FlightSuretyApp {
         uint8[3] memory indexes = generateIndexes(msg.sender);
 
         oracles[msg.sender] = Oracle({isRegistered: true, indexes: indexes});
+
+        emit OracleRegistered();
     }
 
     function getMyIndexes() view external returns(uint8[3])
@@ -327,7 +317,7 @@ contract FlightSuretyApp {
     // For the response to be accepted, there must be a pending request that is open
     // and matches one of the three Indexes randomly assigned to the oracle at the
     // time of registration (i.e. uninvited oracles are not welcome)
-    function submitOracleResponse(uint8 index, address airline, string flight, uint256 timestamp, uint8 statusCode) external
+    function submitOracleResponse(uint8 index, address airline, bytes32 flight, uint256 timestamp, uint8 statusCode) external
     {
         require((oracles[msg.sender].indexes[0] == index) || (oracles[msg.sender].indexes[1] == index) || (oracles[msg.sender].indexes[2] == index), "Index does not match oracle request");
 
@@ -394,14 +384,15 @@ contract FlightSuretyApp {
 contract FlightSuretyData {
     //function registerAirline(address airlineAddress) external;
     //function registerFlight(bytes32 flight, uint256 timeStamp, uint8 statusCode, address airlineAddress) external;
-    function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external;
-    function isFlightRegistered(bytes32 flight) external returns (bool);
-    function deductInsuranceFundUponCredit(uint256 amount) external;
+    //function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external;
+    //function isFlightRegistered(bytes32 flight) external returns (bool);
+    // function fund() payable external;
     //function buy(bytes32 flight) external payable;
     //function creditInsurees(bytes32 flight) payable external returns(uint256);
-    function test1() external;
-    function test2() returns (uint256);
-    function test3() public view returns (bool);
+    // function pay()external payable;
+    // function test1() external;
+    // function test2() returns (uint256);
+    // function test3() public view returns (bool);
     function registerAirline(address airlineAddress) external;
     function registerInitialAirline() external;
     function returnInitialAirline() external returns(address);

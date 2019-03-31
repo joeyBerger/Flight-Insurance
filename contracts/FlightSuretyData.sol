@@ -147,6 +147,12 @@ contract FlightSuretyData {
         _;
     }
 
+    modifier airlineIsNotPreviouslyFunded
+    {
+        require(airlines[msg.sender].isFunded != true, "Airline must not already be funded");
+        _;
+    }
+
     //Events
 
     event Test2(uint256 returnVal);
@@ -168,17 +174,17 @@ contract FlightSuretyData {
         return true;
     }
 
-    function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external
-    {
-        //TODO
-        //flights[flight].updatedTimestamp = 1;
+    // function processFlightStatus(address airline, string flight, uint256 timestamp, uint8 statusCode) external
+    // {
+    //     //TODO
+    //     //flights[flight].updatedTimestamp = 1;
 
-        bytes32 temp = "fda";
-        if (statusCode == STATUS_CODE_LATE_AIRLINE)
-        {
-            creditInsurees(temp);
-        }
-    }
+    //     bytes32 temp = "fda";
+    //     if (statusCode == STATUS_CODE_LATE_AIRLINE)
+    //     {
+    //         creditInsurees(temp);
+    //     }
+    // }
 
     //  function Time_call() returns (uint256){
     //     return now;
@@ -239,7 +245,7 @@ contract FlightSuretyData {
         airlines[initialAirline] = newAirline;
     }   
 
-    function fundAirline() external payable  //requireEtherEqualTo10
+    function fundAirline() external payable airlineIsNotPreviouslyFunded
     {
         airlines[msg.sender].isFunded = true;
         insuranceBalance = insuranceBalance.add(msg.value);
@@ -313,19 +319,14 @@ contract FlightSuretyData {
     //     require(account[msg.sender].creditAmount > 0);
     //     uint256 prev = account[msg.sender].creditAmount;
     //     account[msg.sender].creditAmount = 0;
-    //     insuranceBalance-= prev;
+    //     // insuranceBalance-= prev;
     //     msg.sender.transfer(prev);
     // }
 
     //Initial funding for the insurance. Unless there are too many delayed flights resulting in insurance payouts, the contract should be self-sustaining
-    function fund() public payable
+    function fund() payable
     {
         insuranceBalance = msg.value;
-    }
-
-    function deductInsuranceFundUponCredit(uint256 amount) external
-    {
-        insuranceBalance = insuranceBalance.sub(amount);
     }
 
     function getFlightKey(address airline,string memory flight,uint256 timestamp) pure internal returns(bytes32) 
@@ -339,25 +340,25 @@ contract FlightSuretyData {
         fund();
     }
 
-    function test() public pure returns (bool)
-    {
-        return false;
-    }
+    // function test() public pure returns (bool)
+    // {
+    //     return false;
+    // }
 
-    function test1() external
-    {
-    }
+    // function test1() external
+    // {
+    // }
 
-    function test2() view external returns (uint256)
-    {
-        uint256 tempReturn = 46;
-        return tempReturn;
-    }
+    // function test2() view external returns (uint256)
+    // {
+    //     uint256 tempReturn = 46;
+    //     return tempReturn;
+    // }
 
-    function test3() pure external returns (bool)
-    {
-        return true;
-    }
+    // function test3() pure external returns (bool)
+    // {
+    //     return true;
+    // }
     
 }
 

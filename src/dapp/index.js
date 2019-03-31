@@ -16,71 +16,63 @@ import './flightsurety.css';
             display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         });
 
-
-        // contract.generateFlights((error, result) => {
-        //     console.log("Flight Registered",error,result);
-        //     //display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
-        // });
-
-        // contract.testFunc1((error, result) => {
-        //     console.log("testFunc1",error,result);
-        //     //display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
-        // });
         // User-submitted transaction
-        // DOM.elid('submit-oracle').addEventListener('click', () => {
-        //     let flight = DOM.elid('flight-number').value;
-        //     // Write transaction
-        //     contract.fetchFlightStatus(flight, (error, result) => {
-        //         display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
-        //     });
-        // })
-
-        // User-submitted transaction
-        DOM.elid('test1').addEventListener('click', () => {
-            let flight = DOM.elid('drop-down-flights').value;
+        DOM.elid('registerFlight').addEventListener('click', () => {
+            let flight = DOM.elid('dropDownFlights_register').value;
             contract.generateFlight(flight,(error, result) => {
                 console.log(result);
             });
         })    
 
         // User-submitted transaction
-        DOM.elid('test2').addEventListener('click', () => {
-            contract.testFunc2((error, result) => {
+        DOM.elid('isRegistered').addEventListener('click', () => {
+            let flight = DOM.elid('dropDownFlights_isRegistered').value;
+            contract.isFlightRegistered(flight,(error, result) => {
                 console.log(result);
             });
         })  
         
         // User-submitted transaction
-        DOM.elid('test3').addEventListener('click', () => {
-            contract.testFunc3((error, result) => {
+        DOM.elid('fundAirline').addEventListener('click', () => {
+            contract.fundAirline((error, result) => {
                 console.log(result);
             });
         })  
 
         // User-submitted transaction
-        DOM.elid('test4').addEventListener('click', () => {
-            contract.testFunc4((error, result) => {
+        DOM.elid('buyInsurance').addEventListener('click', () => {            
+            let insuranceValue = DOM.elid('insuranceValue').value;
+            let flight = DOM.elid('dropDownFlights_buyInsurance').value;            
+            contract.buyInsurace(flight,insuranceValue,(error, result) => {
                 console.log(result);
             });
         })  
 
         // User-submitted transaction
-        DOM.elid('test5').addEventListener('click', () => {
-            contract.testFunc5((error, result) => {
+        DOM.elid('showCreditBalance').addEventListener('click', () => {
+            contract.returnCreditAmount((error, result) => {
                 console.log(result);
             });
         }) 
 
         // User-submitted transaction
-        DOM.elid('test6').addEventListener('click', () => {
-            contract.testFunc6((error, result) => {
+        DOM.elid('payout').addEventListener('click', () => {
+            contract.payoutInsurance((error, result) => {
                 console.log(result);
             });
         }) 
 
         // User-submitted transaction
-        DOM.elid('test7').addEventListener('click', () => {
-            contract.testFunc7((error, result) => {
+        DOM.elid('fetchFlightStatus').addEventListener('click', () => {
+            let flight = DOM.elid('dropDownFlights_fetchFlight').value;   
+            contract.fetchFlightStatus(flight,(error, result) => {
+                console.log(result);
+            });
+        }) 
+
+        // User-submitted transaction
+        DOM.elid('showUserBalance').addEventListener('click', () => {
+            contract.showUserBalance((error, result) => {
                 console.log(result);
             });
         }) 

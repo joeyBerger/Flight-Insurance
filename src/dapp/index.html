@@ -20,7 +20,6 @@
     </nav>
 
     <!-- <main class="container">
-
         <div id="display-wrapper" class="top-20">
         </div>
         <div class="row top-20">
@@ -29,38 +28,56 @@
     </main> -->
 
     <main class="container">
-
         <div id="display-wrapper" class="top-20">
         </div>
         <div class="row top-20">
-            <select id="drop-down-flights">                
+            <select id="dropDownFlights_register">                
                 <option value="flight1">SWX 435</option>
                 <option value="flight2">AA 546</option>
                 <option value="flight3">UA 1123</option>
             </select>
-            <br><br />
-            <btn class="btn btn-primary" id="test1">Register</btn>
+            <btn class="btn btn-primary" id="registerFlight">Register</btn>
         </div>
-
         <div id="display-wrapper" class="top-20">
         </div>
         <div class="row top-20">
-            <label class="form">Test2</label> <input type="text" id="t"> <btn class="btn btn-primary" id="test2">Is Flight Registered</btn>
+            <select id="dropDownFlights_isRegistered">                
+                <option value="flight1">SWX 435</option>
+                <option value="flight2">AA 546</option>
+                <option value="flight3">UA 1123</option>
+            </select>
+            <btn class="btn btn-primary" id="isRegistered">Is Flight Registered</btn>
         </div>
         <div class="row top-20">
-            <label class="form">Test3</label> <input type="text" id="t"> <btn class="btn btn-primary" id="test3">Fund Initial Airline</btn>
+            <label class="form">Fund Airline</label> <input type="text" id="t" value="10"> <btn class="btn btn-primary" id="fundAirline">Fund Initial Airline</btn>
         </div>
         <div class="row top-20">
-            <label class="form">Test4</label> <input type="text" id="t"> <btn class="btn btn-primary" id="test4">Buy Insurance</btn>
+            <select id="dropDownFlights_buyInsurance">                
+                    <option value="flight1">SWX 435</option>
+                    <option value="flight2">AA 546</option>
+                    <option value="flight3">UA 1123</option>
+            </select>            
+            <input type="text" id="insuranceValue" value=".5"> <btn class="btn btn-primary" id="buyInsurance">Buy Insurance</btn>       
+        </div>
+        <!-- <div class="row top-20">
+            <label class="form">Test4</label> <btn class="btn btn-primary" id="test5">Credit</btn>
+        </div> -->
+        <div class="row top-20">
+            <label class="form">Show Credit Balance</label> <btn class="btn btn-primary" id="showCreditBalance">Show Credit Balance</btn>
         </div>
         <div class="row top-20">
-            <label class="form">Test4</label> <input type="text" id="t"> <btn class="btn btn-primary" id="test5">Credit</btn>
+            <label class="form">Payout After Credit</label> <btn class="btn btn-primary" id="payout">Payout</btn>
         </div>
         <div class="row top-20">
-            <label class="form">Test5</label> <input type="text" id="t"> <btn class="btn btn-primary" id="test6">Show Credit</btn>
+            <select id="dropDownFlights_fetchFlight">                
+                    <option value="flight1">SWX 435</option>
+                    <option value="flight2">AA 546</option>
+                    <option value="flight3">UA 1123</option>
+            </select>  
+            <btn class="btn btn-primary" id="fetchFlightStatus">Fetch Flight Status</btn>
         </div>
         <div class="row top-20">
-            <label class="form">Test6</label> <input type="text" id="t"> <btn class="btn btn-primary" id="test7">Payout</btn>
+            <label class="form">Show Balance</label> <btn class="btn btn-primary" id="showUserBalance">Show Balance</btn>
         </div>
     </main>
 

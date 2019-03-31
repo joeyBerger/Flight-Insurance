@@ -57,51 +57,22 @@ export default class Contract {
             });
     }
 
-    // generateFlights(callback) {
-    //     let self = this;
-    //     let flights = ["flight1","flight2","flight3"];
-    //     console.log(Math.floor(Date.now() / 1000));
-    //     for (var i = 0; i < flights.length; i++) {
-    //         self.flightSuretyApp.methods
-    //         .registerFlight(this.web3.utils.fromAscii(flights[i]),1234,this.airlines[0])
-    //         .call({ from: self.owner}, callback);
-    //     }
-    //  }
-
      generateFlight(flight, callback) {
-         console.log(flight);
         let self = this;
         let time = Number(Math.floor(Date.now() / 1000));
         self.flightSuretyApp.methods     
         .registerFlight(this.web3.utils.fromAscii(flight),time,this.airlines[0])
         .send({ from: self.owner}, callback);    
-
-        // .test1()
-        // .send({ from: self.owner}, callback);    
      }
 
-     isFlightRegistered(flight, callback) {
-        let self = this;
-        self.flightSuretyApp.methods
-        .isFlightRegistered(this.web3.utils.fromAscii("flight1"))
-        .send({ from: self.owner}, callback);
-     }
-
-    //  testFunc1(callback) {
-    //     let self = this;
-    //     self.flightSuretyApp.methods
-    //     .test1()
-    //     .send({ from: self.owner}, callback);
-    //  }
-
-     testFunc2(callback) {
+     isFlightRegistered(flight,callback) {
         let self = this;
         self.flightSuretyApp.methods      
-        .isFlightRegistered(this.web3.utils.fromAscii("flight1"))
+        .isFlightRegistered(this.web3.utils.fromAscii(flight))
         .call({ from: self.owner}, callback);
      }
 
-     testFunc3(callback) {
+     fundAirline(callback) {
         let self = this;
         const amount = 10;
         const amountToSend = this.web3.utils.toWei(amount.toString(), "ether");
@@ -110,35 +81,58 @@ export default class Contract {
         .send({from:self.airlines[0],value: amountToSend}, callback);
      }
 
-     testFunc4(callback) {
+     buyInsurace(flight,insuranceValue,callback) {
         let self = this;
-        const amount = .5;
+        const amount = insuranceValue;
         const amountToSend = this.web3.utils.toWei(amount.toString(), "ether");
         self.flightSuretyApp.methods
-        .buy(this.web3.utils.fromAscii("flight1"))
-        .send({ from: self.owner, value: amountToSend}, callback);
+        // .buy(this.web3.utils.fromAscii("flight1"))
+        .buy(this.web3.utils.fromAscii(flight))
+        .send({ from: self.owner, value: amountToSend, gas: 1000000}, callback);
      }
 
-     testFunc5(callback) {
+     submitToOracles(callback) {
         let self = this;
         self.flightSuretyApp.methods
         .creditInsurees(this.web3.utils.fromAscii("flight1"))
         .send({ from: self.owner}, callback);
      }
 
-     testFunc6(callback) {
+     creditInsureesTest(callback) {
+        let self = this;
+        self.flightSuretyApp.methods
+        .creditInsurees(this.web3.utils.fromAscii("flight1"))
+        .send({ from: self.owner}, callback);
+     }
+
+     returnCreditAmount(callback) {
         let self = this;
         self.flightSuretyApp.methods
         .returnCreditAmount()
         .call({ from: self.owner}, callback);
      }
 
-     testFunc7(callback) {
-        console.log("in pay");
+     payoutInsurance(callback) {
         let self = this;
-        self.flightSuretyApp.methods
-        //.tempReturnCreditAmount()
+        self.flightSuretyApp.methods        
         .payout()
         .send({ from: self.owner}, callback);
      }     
+
+     fetchFlightStatus(flight,callback) {
+        console.log("fetchFlightStatus",flight);
+        let self = this;
+        let time = Number(Math.floor(Date.now() / 1000));
+        self.flightSuretyApp.methods        
+        .fetchFlightStatus(self.airlines[0],flight,time)
+        .send({ from: self.owner}, callback);
+     } 
+
+     //show user's current balance
+     showUserBalance(callback) {
+        let self = this;
+        this.web3.eth.getBalance(self.owner).then(function(value){
+            console.log(value)
+        });
+     } 
 }

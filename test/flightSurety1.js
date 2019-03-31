@@ -12,10 +12,6 @@ contract('Flight Surety Tests', async (accounts) => {
     config.flightSuretyData.fund({value:fundAmount});
   });
 
-  /****************************************************************************************/
-  /* Operations and Settings                                                              */
-  /****************************************************************************************/
-
   it('(airlines) can vote on a new airline, and that airline can be registered', async () => {
 
   // ARRANGE
@@ -52,7 +48,7 @@ contract('Flight Surety Tests', async (accounts) => {
     await config.flightSuretyData.castVoteForNewAirline(votedAirline,{from: newAirline}) 
     
     try {
-        await config.flightSuretyData.registerAirline(votedAirline, {from: config.firstAirline});
+        await config.flightSuretyApp.registerAirline(votedAirline, {from: config.firstAirline});
     }
     catch(e) {
         
@@ -91,7 +87,7 @@ contract('Flight Surety Tests', async (accounts) => {
     
     // ACT  
     try {
-      await config.flightSuretyData.fundAirline({from: fundedAirline, value: amount})
+      await config.flightSuretyApp.fundAirline({from: fundedAirline, value: amount})
     }
     catch(e) {
       result = false;
