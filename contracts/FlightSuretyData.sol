@@ -122,21 +122,21 @@ contract FlightSuretyData {
 
     //Add an airline to the registration queue
     //Can only be called from FlightSuretyApp contract
-    function registerAirline(address airlineAddress) external isAirlineFunded hasVotes(airlineAddress) {
+    function registerAirline(address airlineAddress) external isAirlineFunded hasVotes(airlineAddress) requireIsOperational {
         airlinesRegistered = airlinesRegistered.add(1);
         Airline memory newRegisteredAirline = Airline(airlinesRegistered, airlineAddress, false);
         airlines[airlineAddress] = newRegisteredAirline;
     }
 
     //Registers initial airline
-    function registerInitialAirline() external {
+    function registerInitialAirline() external requireIsOperational {
         airlinesRegistered = airlinesRegistered.add(1);
         Airline memory registeredAirline = Airline(airlinesRegistered, initialAirline, false);
         airlines[initialAirline] = registeredAirline;
     }
 
     //Funds airline
-    function fundAirline() external payable airlineIsNotPreviouslyFunded {
+    function fundAirline() external payable airlineIsNotPreviouslyFunded requireIsOperational {
         airlines[msg.sender].isFunded = true;
         insuranceBalance = insuranceBalance.add(msg.value);
 
@@ -152,7 +152,7 @@ contract FlightSuretyData {
     }
 
     //Cast vote for airline
-    function castVoteForNewAirline(address inewAirline) public isAirlineFunded {
+    function castVoteForNewAirline(address inewAirline) public isAirlineFunded requireIsOperational{
         if (newAirline[inewAirline].votes == 0) {
             NewAirline memory newAirlineEntry = NewAirline(1);
             newAirline[inewAirline] = newAirlineEntry;

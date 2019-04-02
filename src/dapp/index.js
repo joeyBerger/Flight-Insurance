@@ -56,7 +56,7 @@ import './flightsurety.css';
         }) 
 
         // User-submitted transaction
-        DOM.elid('payout').addEventListener('click', () => {
+        DOM.elid('withdrawl').addEventListener('click', () => {
             contract.payoutInsurance((error, result) => {
                 console.log(result);
             });

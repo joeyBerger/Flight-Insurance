@@ -43,15 +43,9 @@ contract FlightSuretyApp {
 
     //Function Modifiers
 
-    // Modify to call data contract's status
+    // // Modify to call data contract's status
     modifier requireIsOperational() {
         require(isOperationalFlag == true, "Contract is currently not operational");
-        _;
-    }
-
-    //Modifier that requires the "ContractOwner" account to be the function caller
-    modifier requireContractOwner() {
-        require(msg.sender == contractOwner, "Caller is not contract owner");
         _;
     }
 
@@ -99,11 +93,11 @@ contract FlightSuretyApp {
         _;
     }
 
-    //Modifier that checks if registering airline is indeed the initial airline
-    modifier requiReregisteringAirlineIsInitial() {
-        //require(msg.value <= 1 ether, "Ether required must be less or equal to 1.");
-        _;
-    }
+    // //Modifier that checks if registering airline is indeed the initial airline
+    // modifier requiReregisteringAirlineIsInitial() {
+    //     //require(msg.value <= 1 ether, "Ether required must be less or equal to 1.");
+    //     _;
+    // }
 
     //Constructor
     constructor(address dataContract) public {
@@ -122,7 +116,7 @@ contract FlightSuretyApp {
     //Smart Contract Functions
 
     //Add an airline to the registration queue
-    function registerAirline(address airline) public {
+    function registerAirline(address airline) public requireIsOperational {
         flightSuretyData.registerAirline(airline);
     }
 
@@ -131,7 +125,7 @@ contract FlightSuretyApp {
     }
 
     //Register a future flight for insuring.
-    function registerFlight(bytes32 flight, uint256 timeStamp, address airlineAddress) public requireFlightNotRegistered(flight) {
+    function registerFlight(bytes32 flight, uint256 timeStamp, address airlineAddress) public requireIsOperational requireFlightNotRegistered(flight) {
         //TODO: track airline with flight
         Flight memory newFlight = Flight(true, 0, timeStamp, contractOwner, new address[](0));
         flights[flight] = newFlight;
@@ -142,17 +136,17 @@ contract FlightSuretyApp {
         return isRegistered;
     }
 
-    function buy(bytes32 flight) public payable requireFlightRegistered(flight) requireNewPurchase(flight) requireEtherMoreThanZero requireEtherNoMoreThanOneEther {
+    function buy(bytes32 flight) public payable requireIsOperational requireFlightRegistered(flight) requireNewPurchase(flight) requireEtherMoreThanZero requireEtherNoMoreThanOneEther {
         address buyerAddress = msg.sender;
         PurchasedInsurance memory newInsurance = PurchasedInsurance(msg.value, buyerAddress);
         flights[flight].insurance[flight] = newInsurance;
         flights[flight].insuredAddresses.push(buyerAddress);
     }
 
-    function creditInsurees(bytes32 flight, address insuredAddress) payable returns(uint256) {
-        uint256 amount0 = flights[flight].insurance[flight].purchaseAmount.div(2);
-        uint256 amount1 = flights[flight].insurance[flight].purchaseAmount;
-        uint256 returnAmount = amount0.add(amount1);
+    //function creditInsurees(bytes32 flight, address insuredAddress) payable returns(uint256) {
+    function creditInsurees(bytes32 flight, address insuredAddress) returns(uint256) {
+        //multiply the purchase amount by 1.5
+        uint256 returnAmount = flights[flight].insurance[flight].purchaseAmount.mul(3).div(2);
         account[insuredAddress].creditAmount = returnAmount.add(account[insuredAddress].creditAmount);
         return returnAmount;
     }
@@ -165,7 +159,7 @@ contract FlightSuretyApp {
         return account[msg.sender].creditAmount;
     }
 
-    function payout() public payable {
+    function withdrawl() public requireIsOperational {
         require(account[msg.sender].creditAmount > 0);
         uint256 prev = account[msg.sender].creditAmount;
         account[msg.sender].creditAmount = 0;

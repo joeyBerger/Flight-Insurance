@@ -115,7 +115,7 @@ export default class Contract {
      payoutInsurance(callback) {
         let self = this;
         self.flightSuretyApp.methods        
-        .payout()
+        .withdrawl()
         .send({ from: self.owner}, callback);
      }     
 

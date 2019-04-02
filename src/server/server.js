@@ -16,8 +16,8 @@ const STATUS_CODE_LATE_AIRLINE = 20;
 const STATUS_CODE_LATE_WEATHER = 30;
 const STATUS_CODE_LATE_TECHNICAL = 40;
 const STATUS_CODE_LATE_OTHER = 50;
+const statusCodeArr = [STATUS_CODE_UNKNOWN,STATUS_CODE_ON_TIME,STATUS_CODE_LATE_AIRLINE,STATUS_CODE_LATE_WEATHER,STATUS_CODE_LATE_TECHNICAL,STATUS_CODE_LATE_OTHER];
 
-//forcing status code to STATUS_CODE_LATE_AIRLINE, to force a credit to account
 
 const registerInitialOracles = () => new Promise((resolve, reject) => {
   web3.eth.getAccounts(
@@ -80,6 +80,9 @@ const submitOracleResponse = (event) => new Promise((resolve, reject) => {
           }).then(function() {
               if (validOracles.length === 3 && !oracleResponseSubmitted) {
                   oracleResponseSubmitted = true;
+                  let statusCode = statusCodeArr[Math.floor(Math.random()*statusCodeArr.length)]
+                  //forcing status code to STATUS_CODE_LATE_AIRLINE, to force credit to account
+                  statusCode = STATUS_CODE_LATE_AIRLINE;
                   for (var k = 0; k < validOracles.length; k++) {
                       flightSuretyApp.methods
                           .submitOracleResponse(event.returnValues.index, event.returnValues.airline, web3.utils.fromAscii(event.returnValues.flight), event.returnValues.timestamp, STATUS_CODE_LATE_AIRLINE)

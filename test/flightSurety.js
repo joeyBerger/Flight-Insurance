@@ -22,9 +22,10 @@ contract('Flight Surety Tests', async (accounts) => {
 
       // Ensure that access is denied for non-Contract Owner account
       let accessDenied = false;
+      
       try 
       {
-          await config.flightSuretyData.setOperatingStatus(false, { from: config.testAddresses[2] });
+          await config.flightSuretyData.setOperatingStatus(false, {from: config.testAddresses[2]});
       }
       catch(e) {
           accessDenied = true;
@@ -53,7 +54,7 @@ contract('Flight Surety Tests', async (accounts) => {
       let reverted = false;
       try 
       {
-          await config.flightSuretyData.isOperationalFake(true);   //need to properly implement this function
+          await config.flightSuretyData.isOperationalFake(true);
       }
       catch(e) {
           reverted = true;
@@ -83,7 +84,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
   }
   let result = await config.flightSuretyData.isAirline.call(newAirline); 
-  //let result = true;
+
   // ASSERT
   assert.equal(result, true, "Airline should be able to register another airline if it has provided funding");
   });

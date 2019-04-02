@@ -23,7 +23,6 @@ contract('Flight Surety Tests', async (accounts) => {
 
   // ACT
   await config.flightSuretyData.fundAirline({from: config.firstAirline, value: amount})
-  //await config.flightSuretyApp.fundAirline({from: config.firstAirline, value: amount})
 
   // ACT
   for (var i = 0; i < newAirline.length; i++)
@@ -59,22 +58,6 @@ contract('Flight Surety Tests', async (accounts) => {
     assert.equal(result, false, "Airline that has been provided more less than half of the votes of available airlines should not be allowed to register as a new airline.");
     });
 
-  //   it('test', async () => {
-
-  //       // await config.flightSuretyData.test1();
-  //       // await config.flightSuretyData.test1();
-  //       // test = await config.flightSuretyData.test2.call();
-  //       // console.log("test 1",test.toString());
-
-  //       await config.flightSuretyApp.test1();
-  //       await config.flightSuretyApp.test1();
-  //       test = await config.flightSuretyApp.test2.call();
-  //       console.log("test 1",test.toString());
-
-  //       // ASSERT
-  //       assert.equal(false, false, "Airline that has been provided more less than half of the votes of available airlines should not be allowed to register as a new airline.");
-  // });
-
   it('(airline) cannot fund itself if ether value is less than 10', async () => {
 
     // ARRANGE
@@ -93,6 +76,6 @@ contract('Flight Surety Tests', async (accounts) => {
       result = false;
     }
 
-    assert.equal(result, false, "Airline that has been provided more than half of the votes of available airlines should be allowed to register as a new airline.");
+    assert.equal(result, false, "Airline cannot fund itself if the ehter amount is less than 10");
     });
 });
