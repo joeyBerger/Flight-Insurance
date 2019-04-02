@@ -93,12 +93,6 @@ contract FlightSuretyApp {
         _;
     }
 
-    // //Modifier that checks if registering airline is indeed the initial airline
-    // modifier requiReregisteringAirlineIsInitial() {
-    //     //require(msg.value <= 1 ether, "Ether required must be less or equal to 1.");
-    //     _;
-    // }
-
     //Constructor
     constructor(address dataContract) public {
         contractOwner = msg.sender;
